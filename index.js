@@ -21,18 +21,17 @@ app.use(fileUpload({
     tempFileDir: '/tmp/'
 }));
 
-
+// mongodb 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.icikx.mongodb.net/routine?retryWrites=true&w=majority`;
 
 mongoose.connect(uri, () => {
     console.log('connect', uri)
 }, e => console.log(e))
 
-
+// handle JWT
 async function verifyToken(req, res, next) {
     if (req.headers.authorization?.startsWith('Bearer ')) {
         const idToken = req.headers.authorization.split('Bearer ')[1];
-
         try {
             const decodedUser = await admin.auth().verifyIdToken(idToken)
 
@@ -46,11 +45,10 @@ async function verifyToken(req, res, next) {
     }
     next();
 }
+// main program
 async function run() {
     try {
         app.use('/home', home)
-
-
     }
     catch (e) {
 
