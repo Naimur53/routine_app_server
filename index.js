@@ -7,7 +7,8 @@ const fileUpload = require('express-fileupload');
 const mongoose = require('mongoose');
 const router = express.Router()
 // routing pages
-const home = require('./allRoute/home')
+const homeRoute = require('./allRoute/homeRoute')
+const routineRoute = require('./allRoute/routineRoute')
 
 //middle
 var corsOptions = {
@@ -22,7 +23,7 @@ app.use(fileUpload({
 }));
 
 // mongodb 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.icikx.mongodb.net/routine?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@mernapp.ipnfb2l.mongodb.net/?retryWrites=true&w=majority`;
 
 mongoose.connect(uri, () => {
     console.log('connect', uri)
@@ -48,10 +49,11 @@ async function verifyToken(req, res, next) {
 // main program
 async function run() {
     try {
-        app.use('/home', home)
+        app.use('/home', homeRoute)
+        app.use('/routine', routineRoute)
     }
     catch (e) {
-
+        console.log("main", e.message)
     }
 }
 
