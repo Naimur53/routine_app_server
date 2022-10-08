@@ -238,11 +238,65 @@ const demoData = {
     ]
 }
 router.get('/', async (req, res) => {
-    //method for creating
-    // const result = await routineSchema(demoData).populate('creator')
-    // const re = await result.save()
-    const result = await routineSchema.find({}).populate('creator')
-    res.json(result)
+    let result;
+    const { userId, id, len, institute, department, section, semester } = req.query;
+    console.log({ userId, id, len, institute, department, section, semester })
+    try {
+        if (institute) {
+            result = await routineSchema.aggregate([
+                {
+                    $search: {
+                        index: 'institute',
+                        text: {
+                            query: institute,
+                            path: {
+                                'wildcard': '*'
+                            },
+                            fuzzy: {
+                                maxEdits: 1,
+                                prefixLength: 0,
+                                maxExpansions: 50,
+                            }
+                        }
+                    }
+                },
+
+                { $limit: 50 },
+                {
+                    $project: {
+                        department: 1,
+                        institute: 1,
+                        section: 1,
+                        semester: 1,
+                        shift: 1,
+                        creator: 1,
+                        date: 1,
+                        classes: { '$size': '$classes' },
+                        score: { $meta: "searchScore" }
+                    }
+                },
+            ])
+            await routineSchema.populate(result, { path: 'creator', })
+        }
+        else if (userId) {
+            result = await routineSchema.find({ creator: userId }).populate('creator')
+        } else if (id) {
+            const response = await routineSchema.findById(id).populate('creator')
+            result = response || {}
+        } else if (len) {
+            result = await routineSchema.find({}).limit(parseInt(len))
+        }
+        else {
+            result = await routineSchema.find({});
+        }
+        console.log(req.query)
+        res.json(result)
+    }
+    catch (err) {
+        console.log(err)
+        res.status(400).json({ error: 'wrong response' })
+    }
+
 })
 // define the about route
 router.post('/', async (req, res) => {
@@ -250,7 +304,7 @@ router.post('/', async (req, res) => {
         const data = req.body;
         const result = new routineSchema(data)
         const response = await result.save()
-        res.json(response)
+        res.json(result)
     } catch (e) {
         console.log('error', e)
         res.status(400).json({ error: 'Wrong data type' })

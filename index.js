@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const router = express.Router()
 // routing pages
 const homeRoute = require('./allRoute/homeRoute')
+const userRoute = require('./allRoute/userRoute')
 const routineRoute = require('./allRoute/routineRoute')
 
 //middle
@@ -46,10 +47,11 @@ async function verifyToken(req, res, next) {
     }
     next();
 }
+// https://routine-app-server-main.onrender.com/routine
 // main program
 async function run() {
     try {
-        app.use('/home', homeRoute)
+        app.use('/user', userRoute)
         app.use('/routine', routineRoute)
     }
     catch (e) {

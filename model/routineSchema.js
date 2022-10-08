@@ -27,7 +27,7 @@ const routineSchema = new mongoose.Schema({
     },
     institute: {
         type: String,
-        required: true
+        required: true,
 
     },
     section: {
@@ -54,5 +54,4 @@ const routineSchema = new mongoose.Schema({
     classes: [classSchema],
 
 })
-
 module.exports = mongoose.model("routine", routineSchema);
