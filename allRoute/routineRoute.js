@@ -278,6 +278,10 @@ router.get('/', async (req, res) => {
             ])
             await routineSchema.populate(result, { path: 'creator', })
         }
+        else if (userId && id) {
+            result = await routineSchema.findOne({ _id: id, creator: userId }).populate('creator')
+
+        }
         else if (userId) {
             result = await routineSchema.find({ creator: userId }).populate('creator')
         } else if (id) {
@@ -304,6 +308,19 @@ router.post('/', async (req, res) => {
         const data = req.body;
         const result = new routineSchema(data)
         const response = await result.save()
+        res.json(result)
+    } catch (e) {
+        console.log('error', e)
+        res.status(400).json({ error: 'Wrong data type' })
+
+    }
+})
+router.put('/', async (req, res) => {
+    try {
+        const data = req.body;
+        const { id } = req.query
+        const result = await routineSchema.findOneAndUpdate({ _id: id }, data.mainData)
+
         res.json(result)
     } catch (e) {
         console.log('error', e)
