@@ -288,10 +288,10 @@ router.get('/', async (req, res) => {
             const response = await routineSchema.findById(id).populate('creator')
             result = response || {}
         } else if (len) {
-            result = await routineSchema.find({}).limit(parseInt(len))
+            result = await routineSchema.find({}).limit(parseInt(len)).populate('creator')
         }
         else {
-            result = await routineSchema.find({});
+            result = await routineSchema.find({}).populate('creator');
         }
         console.log(req.query)
         res.json(result)
