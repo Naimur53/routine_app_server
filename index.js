@@ -10,6 +10,8 @@ const router = express.Router()
 const homeRoute = require('./allRoute/homeRoute')
 const userRoute = require('./allRoute/userRoute')
 const routineRoute = require('./allRoute/routineRoute')
+const uploadImageRoute = require('./allRoute/uploadImageRoute')
+const requestRoute = require('./allRoute/requestRoute')
 
 //middle
 var corsOptions = {
@@ -53,6 +55,8 @@ async function run() {
     try {
         app.use('/user', userRoute)
         app.use('/routine', routineRoute)
+        app.use('/uploadImage', uploadImageRoute)
+        app.use('/requestRoutine', requestRoute)
     }
     catch (e) {
         console.log("main", e.message)
