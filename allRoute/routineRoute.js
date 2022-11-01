@@ -239,7 +239,7 @@ const demoData = {
 }
 router.get('/', async (req, res) => {
     let result;
-    const { userId, id, len, institute, department, section, semester } = req.query;
+    const { userId, id, len, institute, department, section, semester, requestId } = req.query;
     console.log({ userId, id, len, institute, department, section, semester })
     try {
         if (institute) {
@@ -282,6 +282,9 @@ router.get('/', async (req, res) => {
             result = await routineSchema.findOne({ _id: id, creator: userId }).populate('creator')
 
         }
+        else if (requestId) {
+            result = await routineSchema.findOne({ requestId }).populate('creator')
+        }
         else if (userId) {
             result = await routineSchema.find({ creator: userId }).populate('creator')
         } else if (id) {
@@ -294,7 +297,7 @@ router.get('/', async (req, res) => {
             result = await routineSchema.find({}).populate('creator');
         }
         console.log(req.query)
-        res.json(result)
+        res.json(result || {})
     }
     catch (err) {
         console.log(err)

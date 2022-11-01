@@ -51,6 +51,11 @@ const routineSchema = new mongoose.Schema({
         ref: 'user',
         required: true
     },
+    requestId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'request',
+        required: false,
+    },
     classes: [classSchema],
 
 })

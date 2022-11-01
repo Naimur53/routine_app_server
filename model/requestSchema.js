@@ -23,7 +23,12 @@ const requestSchema = new mongoose.Schema({
     adminMessage: {
         type: String,
         default: () => ""
-    }
+    },
+    routineId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'routine',
+        required: false,
+    },
 
 })
 
