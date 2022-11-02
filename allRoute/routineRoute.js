@@ -331,6 +331,18 @@ router.put('/', async (req, res) => {
 
     }
 })
+router.put('/increaseUsingValue', async (req, res) => {
+    try {
+        const data = req.body;
+        const { id } = req.query
+        const result = await routineSchema.findOneAndUpdate({ _id: id }, { '$inc': { 'totalUserUsing': 1 } })
+        res.json(result)
+    } catch (e) {
+        console.log('error', e)
+        res.status(400).json({ error: 'Wrong data type', err: e })
+
+    }
+})
 
 module.exports = router;
 

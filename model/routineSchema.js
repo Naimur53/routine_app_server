@@ -46,6 +46,10 @@ const routineSchema = new mongoose.Schema({
         type: Date,
         default: () => new Date()
     },
+    totalUserUsing: {
+        type: Number,
+        default: () => 0,
+    },
     creator: {
         type: mongoose.Schema.ObjectId,
         ref: 'user',
