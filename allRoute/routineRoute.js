@@ -239,10 +239,11 @@ const demoData = {
 }
 router.get('/', async (req, res) => {
     let result;
-    const { userId, id, len, institute, department, section, semester, requestId } = req.query;
-    console.log({ userId, id, len, institute, department, section, semester })
+    const { userId, id, len, institute = '', department = '', section = '', semester = '', requestId, skip } = req.query;
+    console.log({ len, institute, skip })
     try {
         if (institute) {
+            console.log('going to text', institute?.length)
             result = await routineSchema.aggregate([
                 {
                     $search: {
@@ -260,8 +261,20 @@ router.get('/', async (req, res) => {
                         }
                     }
                 },
+                {
+                    $match: {
+                        department: { $regex: department, $options: 'i' },
+                        section: { $regex: section, $options: 'i' },
+                        semester: { $regex: semester, $options: 'i' },
+                    }
 
-                { $limit: 50 },
+                },
+                {
+                    $sort: { _id: -1, }
+                },
+                { $skip: skip ? parseInt(skip) : 0 },
+                { $limit: len ? parseInt(len) : 8 },
+
                 {
                     $project: {
                         department: 1,
@@ -271,6 +284,7 @@ router.get('/', async (req, res) => {
                         shift: 1,
                         creator: 1,
                         date: 1,
+                        totalUserUsing: 1,
                         classes: { '$size': '$classes' },
                         score: { $meta: "searchScore" }
                     }
@@ -290,11 +304,18 @@ router.get('/', async (req, res) => {
         } else if (id) {
             const response = await routineSchema.findById(id).populate('creator')
             result = response || {}
-        } else if (len) {
-            result = await routineSchema.find({}).limit(parseInt(len)).populate('creator')
         }
         else {
-            result = await routineSchema.find({}).populate('creator');
+            console.log('normal')
+            result = await routineSchema.find({
+
+                department: { $regex: department, $options: 'i' },
+                section: { $regex: section, $options: 'i' },
+                semester: { $regex: semester, $options: 'i' },
+
+
+            },
+            ).sort({ '_id': -1 }).skip(skip).limit(len).populate('creator');
         }
         console.log(req.query)
         res.json(result || {})
@@ -304,6 +325,22 @@ router.get('/', async (req, res) => {
         res.status(400).json({ error: 'wrong response' })
     }
 
+})
+router.get('/findById', async (req, res) => {
+    try {
+        const result = await routineSchema.findById(req.query.id).populate('creator')
+        if (result) {
+
+            res.json(result)
+        } else {
+            res.status(400).json({ err: 'data not found' })
+        }
+
+
+    }
+    catch (err) {
+        res.status(400).json({ err: 'Id not valid' })
+    }
 })
 // define the about route
 router.post('/', async (req, res) => {
@@ -333,14 +370,27 @@ router.put('/', async (req, res) => {
 })
 router.put('/increaseUsingValue', async (req, res) => {
     try {
-        const data = req.body;
         const { id } = req.query
+        console.log({ id })
         const result = await routineSchema.findOneAndUpdate({ _id: id }, { '$inc': { 'totalUserUsing': 1 } })
+        console.log(result)
         res.json(result)
     } catch (e) {
         console.log('error', e)
         res.status(400).json({ error: 'Wrong data type', err: e })
 
+    }
+})
+router.delete('/:id', async (req, res) => {
+    const { id } = req.params
+    try {
+        // const { id } = req.query
+        console.log({ id })
+        const result = await routineSchema.deleteOne({ _id: id })
+        res.json(result)
+    } catch (e) {
+        console.log('error', e)
+        res.status(400).json({ error: 'Wrong data type', err: e })
     }
 })
 

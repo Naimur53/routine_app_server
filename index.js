@@ -12,6 +12,7 @@ const userRoute = require('./allRoute/userRoute')
 const routineRoute = require('./allRoute/routineRoute')
 const uploadImageRoute = require('./allRoute/uploadImageRoute')
 const requestRoute = require('./allRoute/requestRoute')
+const adminRoute = require('./allRoute/adminRoute')
 
 //middle
 var corsOptions = {
@@ -57,6 +58,7 @@ async function run() {
         app.use('/routine', routineRoute)
         app.use('/uploadImage', uploadImageRoute)
         app.use('/requestRoutine', requestRoute)
+        app.use('/admin', adminRoute)
     }
     catch (e) {
         console.log("main", e.message)
