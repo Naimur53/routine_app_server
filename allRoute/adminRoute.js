@@ -61,6 +61,37 @@ router.get('/userCount', async (req, res) => {
     catch (err) {
         res.status(400).json({ error: 'bad req' })
 
+
+    }
+})
+router.get('/', async (req, res) => {
+
+    try {
+        const response = await userSchema.find({isAdmin:true})
+        res.json(response)
+    }
+    catch (err) {
+        res.status(400).json({ error: 'bad req' })
+
+    }
+})
+ 
+router.put('/', async (req, res) => {
+
+    try {
+        const {email,adminStatus}=req.query;
+        console.log({email,adminStatus})
+        const response = await userSchema.updateOne({email},{$set:{isAdmin:adminStatus}})
+        if(response.matchedCount){
+
+            res.json(response)
+        }else{
+            res.status(400).json({error:'user not found'})
+        }
+    }
+    catch (err) {
+        res.status(400).json({ error: 'bad req' })
+
     }
 })
 module.exports = router;
