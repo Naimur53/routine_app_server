@@ -13,6 +13,7 @@ const routineRoute = require('./allRoute/routineRoute')
 const uploadImageRoute = require('./allRoute/uploadImageRoute')
 const requestRoute = require('./allRoute/requestRoute')
 const adminRoute = require('./allRoute/adminRoute')
+const tesseract = require("node-tesseract-ocr")
 
 //middle
 var corsOptions = {
@@ -59,6 +60,25 @@ async function run() {
         app.use('/uploadImage', uploadImageRoute)
         app.use('/requestRoutine', requestRoute)
         app.use('/admin', adminRoute)
+
+        app.get("/test", async (req, res) => {
+            const config = {
+                lang: "eng",
+                oem: 1,
+                psm: 3,
+            }
+
+            const img = "https://tesseract.projectnaptha.com/img/eng_bw.png"
+
+            tesseract.recognize(img, config)
+                .then((text) => {
+                    console.log("Result:", text)
+                })
+                .catch((error) => {
+                    console.log(error.message)
+                })
+            res.json({ a: 'hmm' })
+        })
     }
     catch (e) {
         console.log("main", e.message)
