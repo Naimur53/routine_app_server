@@ -44,7 +44,8 @@ const routineSchema = new mongoose.Schema({
     },
     date: {
         type: Date,
-        default: () => new Date()
+        default: () => new Date(),
+        require: true,
     },
     totalUserUsing: {
         type: Number,

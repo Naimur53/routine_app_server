@@ -1,6 +1,7 @@
 const express = require('express')
 const app = express();
 const port = process.env.PORT || 5001;
+const http = require('http');
 require('dotenv').config();
 const cors = require('cors');
 const fileUpload = require('express-fileupload');
@@ -13,7 +14,55 @@ const routineRoute = require('./allRoute/routineRoute')
 const uploadImageRoute = require('./allRoute/uploadImageRoute')
 const requestRoute = require('./allRoute/requestRoute')
 const adminRoute = require('./allRoute/adminRoute')
+const messageRoute = require('./allRoute/messageRoute')
 const tesseract = require("node-tesseract-ocr")
+
+// socket 
+const { Server } = require('socket.io');
+const server = http.createServer(app);
+
+//io server
+const io = new Server(server, {
+    cors: {
+        origin: '*'
+    }
+});
+//socket io connection
+io.on('connection', (socket) => {
+    console.log(socket.id, 'new');
+    socket.on('join', id => {
+        console.log('Joining ', id);
+        socket.join(id);
+
+    });
+    socket.on('leave', id => {
+        console.log('leave', id);
+        socket.leave(id);
+    });
+    socket.on('message', msg => {
+        console.log(msg.message, msg.routineId)
+        socket.to(msg.routineId).emit('receive_message', msg);
+        // socket.broadcast.emit('message', msg)
+    });
+    socket.on('checkActive', id => {
+        socket.to(id).emit('isActive', id);
+    })
+    socket.on('activeUser', user => {
+        socket.broadcast.emit('receive_activeUser', user)
+    })
+    // socket.on('say to someone', (id, msg) => {
+    //     socket.to(id).emit('my message', msg);
+    //     console.log('person', id, msg);
+    // });
+    // socket.on('join_chat', data => {
+    //     socket.join(data);
+    //     console.log('join', data);
+    // })
+    socket.on('disconnect', () => {
+        console.log('user disconnect', socket.id);
+    })
+
+})
 
 //middle
 var corsOptions = {
@@ -60,6 +109,7 @@ async function run() {
         app.use('/uploadImage', uploadImageRoute)
         app.use('/requestRoutine', requestRoute)
         app.use('/admin', adminRoute)
+        app.use('/message', messageRoute)
 
         app.get("/test", async (req, res) => {
             const config = {
@@ -91,7 +141,7 @@ run().catch(console.dir);
 app.get('/', async (req, res) => {
     res.send('test server is  running   ');
 })
-app.listen(port, () => {
+server.listen(port, () => {
     console.log('server is running at port', port);
 })
 

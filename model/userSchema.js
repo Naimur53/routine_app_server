@@ -2,24 +2,33 @@ const mongoose = require('mongoose')
 
 // main schema 
 const userSchema = new mongoose.Schema({
-    displayName: String,
-    email: String,
-    photoURL: String,
+    displayName: {
+        type: String,
+        require: true,
+    },
+    email: {
+        type: String,
+        require: true,
+    },
+    photoURL: {
+        type: String,
+        require: true,
+    },
     createdAt: String,
 
-    department:String,
+    department: String,
     institute: String,
-    section:String,
-    semester:String,
+    section: String,
+    semester: String,
     shift: String,
-    bio:{
-        type:String,
-        default:''
+    bio: {
+        type: String,
+        default: ''
     },
 
-    thumbnail:{
-        type:String,
-        default:'https://i.ibb.co/C7m1B5f/profilebg-f79815682983162a5b95.jpg'
+    thumbnail: {
+        type: String,
+        default: 'https://i.ibb.co/C7m1B5f/profilebg-f79815682983162a5b95.jpg'
     },
 
     isAdmin: {

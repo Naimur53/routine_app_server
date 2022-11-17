@@ -19,6 +19,7 @@
     "express-fileupload": "^1.4.0",
     "mongoose": "^6.6.1",
     "node-tesseract-ocr": "^2.2.1",
+    "socket.io": "^4.5.3",
     "text-from-image": "^1.1.1"
   }
 }
