@@ -15,6 +15,7 @@ const uploadImageRoute = require('./allRoute/uploadImageRoute')
 const requestRoute = require('./allRoute/requestRoute')
 const adminRoute = require('./allRoute/adminRoute')
 const messageRoute = require('./allRoute/messageRoute')
+const notificationTokenRoute = require('./allRoute/notificationTokenRoute')
 const tesseract = require("node-tesseract-ocr")
 
 // socket 
@@ -110,25 +111,26 @@ async function run() {
         app.use('/requestRoutine', requestRoute)
         app.use('/admin', adminRoute)
         app.use('/message', messageRoute)
+        app.use('/notificationToken', notificationTokenRoute)
 
-        app.get("/test", async (req, res) => {
-            const config = {
-                lang: "eng",
-                oem: 1,
-                psm: 3,
-            }
+        // app.get("/test", async (req, res) => {
+        //     const config = {
+        //         lang: "eng",
+        //         oem: 1,
+        //         psm: 3,
+        //     }
 
-            const img = "https://tesseract.projectnaptha.com/img/eng_bw.png"
+        //     const img = "https://tesseract.projectnaptha.com/img/eng_bw.png"
 
-            tesseract.recognize(img, config)
-                .then((text) => {
-                    console.log("Result:", text)
-                })
-                .catch((error) => {
-                    console.log(error.message)
-                })
-            res.json({ a: 'hmm' })
-        })
+        //     tesseract.recognize(img, config)
+        //         .then((text) => {
+        //             console.log("Result:", text)
+        //         })
+        //         .catch((error) => {
+        //             console.log(error.message)
+        //         })
+        //     res.json({ a: 'hmm' })
+        // })
     }
     catch (e) {
         console.log("main", e.message)
