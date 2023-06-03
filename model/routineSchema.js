@@ -1,5 +1,7 @@
 const mongoose = require('mongoose')
 
+
+
 const classSchema = new mongoose.Schema({
     day: {
         type: String,

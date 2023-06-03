@@ -72,10 +72,10 @@ router.delete('/', async (req, res) => {
     try {
 
         const result = await requestSchema.findByIdAndDelete(id)
+        console.log(result, id);
         res.json(result)
     }
     catch (err) {
-        console.log('dfd', result);
         res.status(400).json({ error: 'bad request' })
     }
 })

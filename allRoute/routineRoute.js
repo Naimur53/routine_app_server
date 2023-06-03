@@ -1,71 +1,101 @@
 const express = require('express')
 const routineSchema = require('../model/routineSchema')
 const router = express.Router()
-const userSchema = require('../model/userSchema')
+const userSchema = require('../model/userSchema');
+const mongoose = require('mongoose')
+
 // middleware that is specific to this router
 // router.use((req, res, next) => {
 //   console.log('Time: ', Date.now())
 //   next()
 // })
-// define the home page route
-
+// define the home page route 
+function isObjectId(text) {
+    return mongoose.Types.ObjectId.isValid(text);
+}
 router.get('/', async (req, res) => {
     let result;
     const { userId, id, len, institute = '', department = '', section = '', semester = '', requestId, skip } = req.query;
-    console.log({ len, institute, skip })
+
     try {
+        const mainSkip = skip ? parseInt(skip) : 0;
+        const mainLen = len ? parseInt(len) : 8
+        console.log({ mainLen, mainSkip });
         if (institute) {
-            console.log('going to text', institute?.length)
-            result = await routineSchema.aggregate([
-                {
-                    $search: {
-                        index: 'institute',
-                        text: {
-                            query: institute,
-                            path: {
-                                'wildcard': '*'
-                            },
-                            fuzzy: {
-                                maxEdits: 1,
-                                prefixLength: 0,
-                                maxExpansions: 50,
+            const isInstituteIsId = isObjectId(institute)
+            if (isInstituteIsId) {
+                console.log('its a id');
+                result = await routineSchema.aggregate([
+                    {
+                        $match: { _id: mongoose.Types.ObjectId(institute) }
+                    }
+                ])
+                await routineSchema.populate(result, { path: 'creator', })
+            } else {
+                result = await routineSchema.aggregate([
+                    {
+                        $search: {
+                            index: 'institute',
+                            text: {
+                                query: institute,
+                                path: {
+                                    'wildcard': '*'
+                                },
+                                fuzzy: {
+                                    maxEdits: 1,
+                                    prefixLength: 0,
+                                    maxExpansions: 50,
+                                }
                             }
                         }
-                    }
-                },
-                {
-                    $match: {
-                        department: { $regex: department, $options: 'i' },
-                        section: { $regex: section, $options: 'i' },
-                        semester: { $regex: semester, $options: 'i' },
-                    }
+                    },
+                    {
+                        $match: {
+                            department: { $regex: department, $options: 'i' },
+                            section: { $regex: section, $options: 'i' },
+                            semester: { $regex: semester, $options: 'i' },
+                        }
 
-                },
-                {
-                    $sort: { _id: -1, }
-                },
-                { $skip: skip ? parseInt(skip) : 0 },
-                { $limit: len ? parseInt(len) : 8 },
+                    },
 
-                {
-                    $project: {
-                        department: 1,
-                        institute: 1,
-                        section: 1,
-                        semester: 1,
-                        shift: 1,
-                        creator: 1,
-                        date: 1,
-                        totalUserUsing: 1,
-                        classes: { '$size': '$classes' },
-                        score: { $meta: "searchScore" }
-                    }
-                },
-            ])
-            await routineSchema.populate(result, { path: 'creator', })
+                    { $skip: mainSkip },
+                    { $limit: mainLen },
+                    {
+                        $addFields: { maxLen: mainLen, skip: mainSkip, }
+                    },
+                    {
+                        $project: {
+
+                            department: 1,
+                            institute: 1,
+                            section: 1,
+                            semester: 1,
+                            shift: 1,
+                            creator: 1,
+                            date: 1,
+                            totalUserUsing: 1,
+                            classes: { '$size': '$classes' },
+                            score: { $meta: "searchScore" },
+                            len: 1,
+                            maxLen: 1,
+                            skip: 1
+
+                        }
+                    },
+                    {
+                        $sort: { 'score': -1, _id: -1, }
+                    },
+
+                ])
+                await routineSchema.populate(result, { path: 'creator', })
+            }
+
+
+
         }
         else if (userId && id) {
-            result = await routineSchema.findOne({ _id: id, creator: userId }).populate('creator')
+            result = await routineSchema.findOne({ _id: mongoose.Types.ObjectId(id), creator: userId }).populate('creator')
+            console.log(userId, id);
 
         }
         else if (requestId) {
@@ -119,8 +149,10 @@ router.post('/', async (req, res) => {
     try {
         const data = req.body;
         const result = new routineSchema(data)
+        console.log(result);
         const response = await result.save()
-        res.json(result)
+        const output = await result.populate('creator')
+        res.json(output)
     } catch (e) {
         console.log('error', e)
         res.status(400).json({ error: 'Wrong data type' })
@@ -132,7 +164,7 @@ router.put('/', async (req, res) => {
         const data = req.body;
         const { id } = req.query
         const result = await routineSchema.findOneAndUpdate({ _id: id }, data.mainData)
-
+        console.log(result, "update");
         res.json(result)
     } catch (e) {
         console.log('error', e)
