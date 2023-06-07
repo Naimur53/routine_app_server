@@ -16,6 +16,7 @@ const requestRoute = require('./allRoute/requestRoute')
 const adminRoute = require('./allRoute/adminRoute')
 const messageRoute = require('./allRoute/messageRoute')
 const notificationTokenRoute = require('./allRoute/notificationTokenRoute')
+const routinePdfRoute = require('./allRoute/routinePdfRoute')
 const tesseract = require("node-tesseract-ocr")
 
 // socket 
@@ -112,6 +113,7 @@ async function run() {
         app.use('/admin', adminRoute)
         app.use('/message', messageRoute)
         app.use('/notificationToken', notificationTokenRoute)
+        app.use('/makePdf', routinePdfRoute)
 
         // app.get("/test", async (req, res) => {
         //     const config = {

@@ -1,4 +1,5 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
+const generateUniqueID = require('../util/idGene');
 
 
 
@@ -23,6 +24,16 @@ const classSchema = new mongoose.Schema({
 })
 // main schema 
 const routineSchema = new mongoose.Schema({
+    id: {
+        type: String,
+        required: true,
+        unique: true,
+        default: () => {
+            return generateUniqueID()
+        },
+        minlength: 8,
+        maxlength: 8
+    },
     department: {
         type: String,
         required: true
@@ -66,4 +77,13 @@ const routineSchema = new mongoose.Schema({
     classes: [classSchema],
 
 })
+
+routineSchema.pre('save', function (next) {
+
+    console.log('hi aim ');
+    if (!this.id) {
+        this.id = generateUniqueID();
+    }
+    next();
+});
 module.exports = mongoose.model("routine", routineSchema);

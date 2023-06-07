@@ -1,5 +1,5 @@
 const express = require('express')
-const  router = express.Router()
+const router = express.Router()
 const userSchema = require('../model/userSchema')
 
 router.get('/', async (req, res) => {
@@ -57,6 +57,20 @@ router.put('/', async (req, res) => {
         const options = { upsert: true }
         const updateDoc = { $set: data }
         const result = await userSchema.updateOne(filter, updateDoc, options);
+        console.log({ result });
+        res.json(result);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(404).json({ error: 'data cant be save', });
+    }
+
+})
+router.get('/delete', async (req, res) => {
+    try {
+        const { email } = req.query;
+
+        const result = await userSchema.deleteOne({ email: email });
         console.log({ result });
         res.json(result);
     }

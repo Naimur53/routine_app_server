@@ -2,8 +2,8 @@ const express = require('express')
 const routineSchema = require('../model/routineSchema')
 const router = express.Router()
 const userSchema = require('../model/userSchema');
-const mongoose = require('mongoose')
-
+const mongoose = require('mongoose');
+const generateUniqueID = require('../util/idGene');
 // middleware that is specific to this router
 // router.use((req, res, next) => {
 //   console.log('Time: ', Date.now())
@@ -13,15 +13,38 @@ const mongoose = require('mongoose')
 function isObjectId(text) {
     return mongoose.Types.ObjectId.isValid(text);
 }
+router.get('/a', async (req, res) => {
+    try {
+        const routines = await routineSchema.find();
+
+        for (const routine of routines) {
+
+            routine.id = generateUniqueID()
+            const resp1 = await routine.save();
+            console.log(resp1);
+        }
+
+        const a = generateUniqueID()
+        res.json({ a })
+        console.log('id field generated for existing documents');
+    } catch (error) {
+        console.error('Error generating id field for existing documents:', error);
+    }
+})
+
 router.get('/', async (req, res) => {
     let result;
-    const { userId, id, len, institute = '', department = '', section = '', semester = '', requestId, skip } = req.query;
+    const { userId, customMadeId, id, len, institute = '', department = '', section = '', semester = '', requestId, skip } = req.query;
 
     try {
         const mainSkip = skip ? parseInt(skip) : 0;
         const mainLen = len ? parseInt(len) : 8
         console.log({ mainLen, mainSkip });
-        if (institute) {
+        if (customMadeId) {
+
+            result = await routineSchema.find({ id: customMadeId }).populate('creator')
+        }
+        else if (institute) {
             const isInstituteIsId = isObjectId(institute)
             if (isInstituteIsId) {
                 console.log('its a id');
@@ -32,6 +55,8 @@ router.get('/', async (req, res) => {
                 ])
                 await routineSchema.populate(result, { path: 'creator', })
             } else {
+
+
                 result = await routineSchema.aggregate([
                     {
                         $search: {
@@ -88,6 +113,8 @@ router.get('/', async (req, res) => {
 
                 ])
                 await routineSchema.populate(result, { path: 'creator', })
+
+
             }
 
 
@@ -148,7 +175,7 @@ router.get('/findById', async (req, res) => {
 router.post('/', async (req, res) => {
     try {
         const data = req.body;
-        const result = new routineSchema(data)
+        const result = await new routineSchema(data)
         console.log(result);
         const response = await result.save()
         const output = await result.populate('creator')

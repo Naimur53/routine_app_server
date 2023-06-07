@@ -5,12 +5,24 @@ const routineSchema = require('../model/routineSchema')
 
 router.get('/', async (req, res) => {
     try {
-        const { routineId } = req.query;
+        const { routineId, skip } = req.query;
+        console.log({ routineId, skip });
         if (routineId) {
-            const response = await messageSchema.find({ routineId }).populate("user")
-            console.log('hi')
+            let skipMessage = skip ? parseInt(skip) : 0
 
-            res.json(response)
+            const response = await messageSchema.find({ routineId }).sort({ _id: -1 }).populate("user").skip(skipMessage).limit(50)
+
+            const totalMessage = await messageSchema.find({ routineId }).count()
+
+            const data = {
+                data: response,
+                totalMessage: totalMessage,
+                skip: skipMessage,
+
+            }
+            // console.log(data);
+            // const count=await response.length
+            res.json(data)
         }
         else {
             const response = await messageSchema.find({})

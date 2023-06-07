@@ -15,6 +15,9 @@ const userSchema = new mongoose.Schema({
         require: true,
     },
     createdAt: String,
+    lastLoginAt: String,
+    lastSignInTime: String,
+    isEmailVerified: String,
 
     department: String,
     institute: String,
