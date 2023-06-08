@@ -67,10 +67,10 @@ io.on('connection', (socket) => {
 })
 
 //middle
-var corsOptions = {
-    origin: '*',
+const corsOptions = {
+    origin: ['http://localhost:3000/', 'https://routine-app-theta.vercel.app/',],
     optionsSuccessStatus: 200
-}
+};
 app.use(cors(corsOptions))
 app.use(express.json());
 app.use(fileUpload({
@@ -84,6 +84,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@mernapp
 mongoose.connect(uri, () => {
     console.log('connect', uri)
 }, e => console.log(e))
+
 
 // handle JWT
 async function verifyToken(req, res, next) {

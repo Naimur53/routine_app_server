@@ -8,7 +8,6 @@ router.get('/', async (req, res) => {
 })
 router.post('/', async (req, res) => {
     const data = req.body;
-    console.log(data, 'token')
     try {
         const result = new notificationTokenSchema(data)
         const response = await result.save()
