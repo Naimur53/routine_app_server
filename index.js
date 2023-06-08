@@ -68,7 +68,7 @@ io.on('connection', (socket) => {
 
 //middle
 const corsOptions = {
-    origin: ['http://localhost:3000/', 'https://routine-app-theta.vercel.app/',],
+    origin: ['http://localhost:3000', 'https://routine-app-theta.vercel.app',],
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions))
