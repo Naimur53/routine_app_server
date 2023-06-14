@@ -17,6 +17,8 @@
     "dotenv": "^16.0.2",
     "express": "^4.18.1",
     "express-fileupload": "^1.4.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
     "mongoose": "^6.6.1",
     "nanoid": "^4.0.2",
     "node-tesseract-ocr": "^2.2.1",
