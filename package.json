@@ -23,6 +23,7 @@
     "nanoid": "^4.0.2",
     "node-tesseract-ocr": "^2.2.1",
     "pdfkit": "^0.13.0",
+    "sharp": "^0.32.1",
     "socket.io": "^4.5.3",
     "text-from-image": "^1.1.1"
   }
