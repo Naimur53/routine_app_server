@@ -50,8 +50,6 @@ router.post("/", async (req, res) => {
     if (file?.name) {
       // Read the image file
       const image = sharp(file.tempFilePath);
-      console.log(file.data.size);
-
       // Compress the image
       const compressedImageBuffer = await image
         .jpeg({ quality: 50 })

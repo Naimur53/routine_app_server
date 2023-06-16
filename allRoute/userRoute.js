@@ -42,13 +42,26 @@ router.post("/", async (req, res) => {
 });
 router.put("/", async (req, res) => {
   try {
-    const userInfo = req.body;
+    let userInfo = req.body;
     console.log(userInfo);
     const filter = { email: userInfo.email };
     const options = { upsert: true, new: true };
 
+    const { shouldUpdateProfileInfo } = req.query;
+
     let updatedUser;
     if (await userSchema.exists(filter)) {
+      if (!shouldUpdateProfileInfo) {
+        userInfo = {
+          createdAt: userInfo?.createdAt,
+          lastLoginAt: userInfo?.lastLoginAt,
+          lastSignInTime: userInfo?.lastSignInTime,
+          isEmailVerified: userInfo?.isEmailVerified,
+        };
+
+        console.log({ shouldUpdateProfileInfo });
+      }
+      console.log({ userInfo }, "this will");
       updatedUser = await userSchema.findOneAndUpdate(
         filter,
         userInfo,
